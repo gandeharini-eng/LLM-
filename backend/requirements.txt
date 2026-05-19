@@ -1,0 +1,10 @@
+fastapi   #used to develop api calls
+uvicorn[standard]    #used to run the api server
+langchain   #it is the LLM framework used to define LLM flow like tokenization, embedding, vector store, retriever and LLM chain
+chromadb   #used to store vector embeddings and perform similarity search
+pypdf   #used for PDF processing
+sentence-transformers   #used for generating sentence embeddings
+openai   #used for interacting with OpenAI's API
+python-multipart   #used for handling multipart/form-data requests/used to upload files to the server
+python-dotenv   #used for loading environment variables from a .env file
+pytest   #used for testing the application
