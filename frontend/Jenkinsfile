@@ -73,12 +73,21 @@ pipeline {
             when { anyOf { branch 'master'; expression { env.BRANCH_NAME == null } } }
             steps {
                 sshagent(credentials: ['ec2-ssh-key']) {
-                    // First copy the docker-compose.yml file to EC2,
-                    // then run docker compose pull + up.
                     sh '''
                         scp -o StrictHostKeyChecking=no docker-compose.yml $EC2_HOST:/home/ubuntu/docker-compose.yml
 
                         ssh -o StrictHostKeyChecking=no $EC2_HOST "
+                            set -e &&
+
+                            # Install docker compose plugin if missing (idempotent)
+                            if ! docker compose version >/dev/null 2>&1; then
+                                echo '>>> Installing docker compose plugin...' &&
+                                sudo mkdir -p /usr/local/lib/docker/cli-plugins &&
+                                sudo curl -fsSL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose &&
+                                sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose &&
+                                docker compose version
+                            fi &&
+
                             mkdir -p /home/ubuntu/chroma_data /home/ubuntu/uploads &&
                             export OPENAI_API_KEY='${OPENAI_API_KEY}' &&
                             cd /home/ubuntu &&
